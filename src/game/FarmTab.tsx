@@ -8,9 +8,9 @@ interface FarmTabProps {
 
 const CAT_COLORS: Record<string, { bg: string; border: string; glow: string }> = {
   earth:   { bg: "rgba(139, 195, 74, 0.12)",  border: "rgba(139, 195, 74, 0.35)",  glow: "#8BC34A" },
-  fire:    { bg: "rgba(255, 112, 67, 0.12)",  border: "rgba(255, 112, 67, 0.35)",  glow: "#FF7043" },
-  water:   { bg: "rgba(41, 182, 246, 0.12)",  border: "rgba(41, 182, 246, 0.35)",  glow: "#29B6F6" },
-  crystal: { bg: "rgba(171, 71, 188, 0.12)",  border: "rgba(171, 71, 188, 0.35)",  glow: "#AB47BC" },
+  fire:    { bg: "rgba(220, 38, 38, 0.14)",   border: "rgba(220, 38, 38, 0.45)",   glow: "#DC2626" },
+  water:   { bg: "rgba(37, 99, 235, 0.14)",   border: "rgba(37, 99, 235, 0.45)",   glow: "#2563EB" },
+  crystal: { bg: "rgba(20, 20, 20, 0.50)",    border: "rgba(90, 90, 90, 0.55)",    glow: "#9CA3AF" },
   moon:    { bg: "rgba(121, 134, 203, 0.12)", border: "rgba(121, 134, 203, 0.35)", glow: "#7986CB" },
 };
 

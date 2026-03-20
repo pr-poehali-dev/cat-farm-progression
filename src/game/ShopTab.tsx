@@ -1,6 +1,12 @@
 import { getCatCount, formatNum } from "@/game/types";
 import type { GameState } from "@/game/types";
 
+const SHOP_COLORS: Record<string, { bg: string; border: string; accent: string }> = {
+  fire:    { bg: "rgba(220, 38, 38, 0.10)",  border: "rgba(220, 38, 38, 0.35)",  accent: "#DC2626" },
+  water:   { bg: "rgba(37, 99, 235, 0.10)",  border: "rgba(37, 99, 235, 0.35)",  accent: "#2563EB" },
+  crystal: { bg: "rgba(20, 20, 20, 0.45)",   border: "rgba(90, 90, 90, 0.50)",   accent: "#9CA3AF" },
+};
+
 interface ShopTabProps {
   state: GameState;
   onBuyCat: (typeId: string, cost: number) => void;
@@ -20,6 +26,7 @@ export default function ShopTab({ state, onBuyCat, onMergeCats, onBuyRocket, onB
         count={getCatCount(state.cats, "fire")}
         onBuy={() => onBuyCat("fire", 1000)}
         tag="Огненное яйцо 🥚"
+        colors={SHOP_COLORS.fire}
       />
       <ShopItem
         emoji="🙀" name="Водяной кот" income={110}
@@ -27,19 +34,25 @@ export default function ShopTab({ state, onBuyCat, onMergeCats, onBuyRocket, onB
         count={getCatCount(state.cats, "water")}
         onBuy={() => onBuyCat("water", 2500)}
         tag="Водяное яйцо 🥚"
+        colors={SHOP_COLORS.water}
       />
 
-      <div className="bg-card border border-border rounded-2xl p-4">
-        <div className="text-xs text-muted-foreground uppercase tracking-widest mb-3">Слияние стихий</div>
+      <div className="rounded-2xl p-4" style={{
+        background: SHOP_COLORS.crystal.bg,
+        border: `1px solid ${SHOP_COLORS.crystal.border}`,
+      }}>
+        <div className="text-xs uppercase tracking-widest mb-3" style={{ color: SHOP_COLORS.crystal.accent }}>Слияние стихий</div>
         <div className="flex items-start gap-3 mb-3">
           <span className="text-4xl">😸</span>
           <div>
             <div className="font-semibold text-sm">Крепной кот</div>
-            <div className="text-xs text-muted-foreground mt-0.5">200 олимпиков/сек</div>
+            <div className="text-xs mt-0.5" style={{ color: SHOP_COLORS.crystal.accent }}>200 олимпиков/сек</div>
             <div className="text-xs mt-1 opacity-70">требует: 😾 огненный + 🙀 водяной</div>
           </div>
           {getCatCount(state.cats, "crystal") > 0 && (
-            <span className="ml-auto text-xs bg-secondary rounded-full px-2 py-0.5 font-semibold">
+            <span className="ml-auto text-xs rounded-full px-2 py-0.5 font-semibold" style={{
+              background: "rgba(156,163,175,0.15)", color: SHOP_COLORS.crystal.accent
+            }}>
               ×{getCatCount(state.cats, "crystal")}
             </span>
           )}
@@ -101,24 +114,38 @@ export default function ShopTab({ state, onBuyCat, onMergeCats, onBuyRocket, onB
 
 // ─── ShopItem ─────────────────────────────────────────────────────────────────
 
-function ShopItem({ emoji, name, income, price, balance, count, onBuy, tag }: {
+function ShopItem({ emoji, name, income, price, balance, count, onBuy, tag, colors }: {
   emoji: string; name: string; income: number; price: number; balance: number;
   count: number; onBuy: () => void; tag: string;
+  colors?: { bg: string; border: string; accent: string };
 }) {
   const canBuy = balance >= price;
   return (
-    <div className="cat-card bg-card border border-border rounded-2xl p-4">
+    <div
+      className="cat-card rounded-2xl p-4"
+      style={colors ? { background: colors.bg, border: `1px solid ${colors.border}` } : {
+        background: "hsl(var(--card))", border: "1px solid hsl(var(--border))"
+      }}
+    >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <span className="text-4xl">{emoji}</span>
           <div>
             <div className="font-semibold text-sm">{name}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">{income} олимпиков/сек</div>
+            <div className="text-xs mt-0.5" style={{ color: colors?.accent ?? "hsl(var(--muted-foreground))" }}>
+              {income} олимпиков/сек
+            </div>
             <div className="text-xs mt-1 opacity-60">{tag}</div>
           </div>
         </div>
         {count > 0 && (
-          <span className="text-xs bg-secondary rounded-full px-2 py-0.5 font-semibold">×{count}</span>
+          <span
+            className="text-xs rounded-full px-2 py-0.5 font-semibold"
+            style={colors
+              ? { background: `${colors.accent}22`, color: colors.accent }
+              : { background: "hsl(var(--secondary))", color: "hsl(var(--foreground))" }
+            }
+          >×{count}</span>
         )}
       </div>
       <button
