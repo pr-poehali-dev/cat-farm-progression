@@ -91,7 +91,7 @@ export default function ShopTab({ state, onBuyCat, onMergeCats, onBuyRocket, onB
         </div>
         {state.rocketUnlocked && (
           <div className="flex items-center gap-3 pt-3 border-t border-border">
-            <span className="text-3xl">😻</span>
+            <span className="text-blue-900 text-4xl px-[5px]">😻</span>
             <div className="flex-1">
               <div className="font-semibold text-sm">Лунный кот</div>
               <div className="text-xs text-muted-foreground">500 олимпиков/сек</div>
