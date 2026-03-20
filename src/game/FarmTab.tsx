@@ -6,16 +6,29 @@ interface FarmTabProps {
   onCatClick: (e: React.MouseEvent) => void;
 }
 
-const CAT_COLORS: Record<string, { bg: string; border: string; glow: string }> = {
-  earth:   { bg: "rgba(139, 195, 74, 0.15)",  border: "rgba(139, 195, 74, 0.40)",  glow: "#8BC34A" },
-  fire:    { bg: "rgba(220, 38, 38, 0.18)",   border: "rgba(220, 38, 38, 0.50)",   glow: "#DC2626" },
-  water:   { bg: "rgba(37, 99, 235, 0.18)",   border: "rgba(37, 99, 235, 0.50)",   glow: "#2563EB" },
-  crystal: { bg: "rgba(20, 20, 20, 0.60)",    border: "rgba(90, 90, 90, 0.60)",    glow: "#9CA3AF" },
-  moon:    { bg: "rgba(121, 134, 203, 0.15)", border: "rgba(121, 134, 203, 0.40)", glow: "#7986CB" },
-};
+// Позиции котов на траве (% от ширины, % от высоты травяной зоны)
+const CAT_POSITIONS = [
+  { x: 50, y: 38, scale: 1.15, delay: "0s" },
+  { x: 22, y: 62, scale: 0.90, delay: "0.4s" },
+  { x: 76, y: 58, scale: 0.95, delay: "0.8s" },
+  { x: 12, y: 42, scale: 0.80, delay: "1.2s" },
+  { x: 86, y: 70, scale: 0.75, delay: "0.6s" },
+  { x: 38, y: 72, scale: 0.85, delay: "1.0s" },
+  { x: 64, y: 44, scale: 0.88, delay: "0.3s" },
+  { x: 56, y: 76, scale: 0.78, delay: "1.5s" },
+];
 
 export default function FarmTab({ state, onCatClick }: FarmTabProps) {
   const unlockedAch = state.achievements.length;
+
+  // Все конкретные коты в виде плоского списка (каждый экземпляр отдельно, макс 8)
+  const allCats: { typeId: string; emoji: string; name: string; }[] = [];
+  state.cats.filter(c => c.count > 0).forEach(c => {
+    const type = CAT_TYPES.find(t => t.id === c.typeId)!;
+    for (let i = 0; i < c.count && allCats.length < 8; i++) {
+      allCats.push({ typeId: c.typeId, emoji: type.emoji, name: type.name });
+    }
+  });
 
   return (
     <div className="animate-fade-in-up relative" style={{ minHeight: "calc(100vh - 120px)" }}>
@@ -62,7 +75,7 @@ export default function FarmTab({ state, onCatClick }: FarmTabProps) {
           <Cloud scale={0.6} />
         </div>
 
-        {/* Деревья — дальний план (мелкие, тёмные) */}
+        {/* Деревья — дальний план */}
         <div className="absolute left-0 right-0 flex items-end justify-around px-1" style={{ bottom: "30%" }}>
           {[0.45, 0.60, 0.40, 0.70, 0.50, 0.65, 0.42, 0.58, 0.48].map((scale, i) => (
             <Tree key={i} scale={scale} layer="far" />
@@ -77,13 +90,13 @@ export default function FarmTab({ state, onCatClick }: FarmTabProps) {
         </div>
 
         {/* Трава */}
-        <div className="absolute left-0 right-0" style={{ bottom: 0, height: "24%" }}>
+        <div className="absolute left-0 right-0" style={{ bottom: 0, height: "35%" }}>
           <div className="w-full h-full" style={{
             background: "linear-gradient(180deg, #2d6a4f 0%, #1b4332 60%, #0f2d1e 100%)"
           }} />
           {/* Травинки */}
           <div className="absolute top-0 left-0 right-0 flex justify-around px-1">
-            {Array.from({ length: 30 }).map((_, i) => (
+            {Array.from({ length: 32 }).map((_, i) => (
               <div key={i} style={{
                 width: 2.5 + (i % 2),
                 height: 12 + (i % 5) * 5,
@@ -97,84 +110,78 @@ export default function FarmTab({ state, onCatClick }: FarmTabProps) {
           </div>
         </div>
 
-        {/* Деревья — передний план (крупные) */}
-        <div className="absolute left-0 right-0 flex items-end justify-between px-3" style={{ bottom: "22%" }}>
+        {/* Деревья — передний план */}
+        <div className="absolute left-0 right-0 flex items-end justify-between px-3" style={{ bottom: "33%" }}>
           <Tree scale={1.3} layer="front" />
           <Tree scale={1.5} layer="front" />
         </div>
 
       </div>
 
-      {/* Кот-кнопка — поверх пейзажа, по центру верхней части */}
-      <div className="relative flex flex-col items-center pt-16 pb-4" style={{ zIndex: 1 }}>
+      {/* Коты на траве */}
+      <div className="fixed left-0 right-0 pointer-events-none" style={{
+        bottom: 80,
+        height: "35%",
+        zIndex: 2,
+        maxWidth: 448,
+        margin: "0 auto",
+      }}>
+        {allCats.map((cat, i) => {
+          const pos = CAT_POSITIONS[i % CAT_POSITIONS.length];
+          return (
+            <div
+              key={`${cat.typeId}-${i}`}
+              className="absolute"
+              style={{
+                left: `${pos.x}%`,
+                top: `${pos.y}%`,
+                transform: `translate(-50%, -50%) scale(${pos.scale})`,
+                animationDelay: pos.delay,
+                fontSize: 36,
+                lineHeight: 1,
+                filter: "drop-shadow(0 3px 8px rgba(0,0,0,0.6))",
+                animation: `float ${2.5 + i * 0.3}s ease-in-out ${pos.delay} infinite`,
+              }}
+            >
+              {cat.emoji}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Кнопка-кот по центру (главный кот для клика) */}
+      <div className="relative flex flex-col items-center pt-14 pb-4" style={{ zIndex: 3 }}>
         <button
-          className="select-none cursor-pointer active:scale-95 transition-transform duration-100 animate-float"
-          style={{ fontSize: 90, lineHeight: 1, filter: "drop-shadow(0 6px 24px rgba(0,0,0,0.7))" }}
+          className="select-none cursor-pointer active:scale-95 transition-transform duration-100 animate-float pointer-events-auto"
+          style={{ fontSize: 88, lineHeight: 1, filter: "drop-shadow(0 6px 24px rgba(0,0,0,0.7))" }}
           onClick={onCatClick}
         >🐱</button>
-        <div className="text-xs mt-4 tracking-wide font-medium" style={{ color: "rgba(255,255,255,0.50)" }}>
+        <div className="text-xs mt-3 tracking-wide font-medium" style={{ color: "rgba(255,255,255,0.50)" }}>
           нажми — получи олимпик
         </div>
       </div>
 
-      {/* Карточки котов — поверх пейзажа внизу */}
-      <div className="relative px-4 space-y-4 pb-6" style={{ zIndex: 1, marginTop: "auto" }}>
-
-        <div>
-          <div className="text-xs uppercase tracking-widest mb-3 px-1" style={{ color: "rgba(255,255,255,0.45)" }}>
-            Твои коты
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {state.cats.filter(c => c.count > 0).map(c => {
-              const type = CAT_TYPES.find(t => t.id === c.typeId)!;
-              const colors = CAT_COLORS[c.typeId] ?? CAT_COLORS.earth;
-              return (
-                <div
-                  key={c.typeId}
-                  className="cat-card rounded-2xl p-4 transition-all"
-                  style={{
-                    background: colors.bg,
-                    border: `1px solid ${colors.border}`,
-                    boxShadow: `0 2px 20px ${colors.glow}20`,
-                    backdropFilter: "blur(10px)",
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-3xl">{type.emoji}</span>
-                    <span className="text-xs rounded-full px-2 py-0.5 font-semibold"
-                      style={{ background: `${colors.glow}28`, color: colors.glow }}>
-                      ×{c.count}
-                    </span>
-                  </div>
-                  <div className="font-semibold text-sm" style={{ color: "rgba(255,255,255,0.9)" }}>{type.name}</div>
-                  <div className="text-xs mt-0.5" style={{ color: colors.glow, opacity: 0.85 }}>
-                    {formatNum(type.income * c.count)}/сек
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Прогресс */}
-        <div className="rounded-2xl p-4 space-y-2.5" style={{
-          background: "rgba(10,18,30,0.65)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          backdropFilter: "blur(12px)",
+      {/* Прогресс внизу */}
+      <div className="relative px-4 pb-4" style={{ zIndex: 3, marginTop: 8 }}>
+        <div className="rounded-2xl p-4 space-y-2" style={{
+          background: "rgba(6,14,26,0.70)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          backdropFilter: "blur(14px)",
         }}>
           <div className="flex justify-between text-xs">
-            <span style={{ color: "rgba(255,255,255,0.45)" }}>Всего заработано</span>
+            <span style={{ color: "rgba(255,255,255,0.40)" }}>Всего заработано</span>
             <span className="font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>{formatNum(state.totalEarned)} ₒ</span>
           </div>
           <div className="flex justify-between text-xs">
-            <span style={{ color: "rgba(255,255,255,0.45)" }}>Достижений</span>
+            <span style={{ color: "rgba(255,255,255,0.40)" }}>Достижений</span>
             <span className="font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>{unlockedAch} / {ACHIEVEMENTS.length}</span>
           </div>
-          <div className="mt-1 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
             <div className="progress-bar h-full" style={{ width: `${(unlockedAch / ACHIEVEMENTS.length) * 100}%` }} />
           </div>
         </div>
       </div>
+
     </div>
   );
 }
