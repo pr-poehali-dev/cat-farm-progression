@@ -209,7 +209,7 @@ export default function Index() {
       </div>
 
       {/* Контент */}
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className={tab === "farm" ? "flex-1" : "flex-1 overflow-y-auto pb-24"}>
         {tab === "farm" && (
           <FarmTab state={state} onCatClick={spawnCoin} />
         )}
