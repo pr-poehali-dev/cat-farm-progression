@@ -31,7 +31,7 @@ export default function FarmTab({ state, onCatClick }: FarmTabProps) {
   });
 
   return (
-    <div className="animate-fade-in-up relative" style={{ minHeight: "calc(100vh - 120px)" }}>
+    <div className="animate-fade-in-up relative mx-0 my-0 px-[50px] py-[5px] bg-neutral-600 rounded-2xl" style={{ minHeight: "calc(100vh - 120px)" }}>
 
       {/* Природный фон — на весь экран */}
       <div className="fixed left-0 right-0 top-0 bottom-0 pointer-events-none" style={{ zIndex: 0 }}>
