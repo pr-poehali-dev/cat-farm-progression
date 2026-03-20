@@ -26,7 +26,7 @@ export function AchievementsTab({ state }: AchievementsTabProps) {
             <div key={a.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
               done ? "bg-card border-border" : "bg-muted border-transparent opacity-40"
             }`}>
-              <span className="text-2xl">{a.icon}</span>
+              <span className="text-2xl px-0 font-medium">{a.icon}</span>
               <div className="flex-1">
                 <div className="font-semibold text-sm">{a.title}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{a.desc}</div>
