@@ -189,9 +189,7 @@ export default function Index() {
             <div className="text-muted-foreground text-sm mb-2">Пока тебя не было</div>
             <div className="gold-text text-3xl font-black mb-1">+{formatNum(showOffline)}</div>
             <div className="text-muted-foreground text-sm mb-6">олимпиков заработали твои коты</div>
-            <button className="btn-gold rounded-xl px-8 py-3 text-sm w-full" onClick={() => setShowOffline(null)}>
-              Забрать
-            </button>
+            <button className="btn-gold rounded-xl px-8 py-3 text-sm w-full mx-0" onClick={() => setShowOffline(null)}>получить</button>
           </div>
         </div>
       )}
